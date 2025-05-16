@@ -34,9 +34,9 @@ jobs:
 
       - name: Login to ECR
         run: |
-          aws ecr get-login-password | docker login --username AWS --password-stdin ${{AWS_ACCOUNT_ID}}.dkr.ecr.${AWS_REGION}.amazonaws.com
+          aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
       - name: Push Docker image
         run: |
-          docker tag tienda-virtual ${{AWS_ACCOUNT_ID}}.dkr.ecr.${AWS_REGION}.amazonaws.com/tienda-virtual
-          docker push ${{AWS_ACCOUNT_ID}}.dkr.ecr.${AWS_REGION}.amazonaws.com/my-image-name
+          docker tag tienda-virtual ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/tienda-virtual
+          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/tienda-virtual
