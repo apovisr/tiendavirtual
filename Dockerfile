@@ -1,5 +1,5 @@
-# Usamos Amazon Corretto 21 como imágen base (incluye el SDK JDK)
-FROM amazoncorretto:21
+# Usamos Amazon Corretto 17 como imágen base (incluye el SDK JDK)
+FROM amazoncorretto:17
 
 # Configuramos el directorio inicial de nuestra app
 WORKDIR /app
