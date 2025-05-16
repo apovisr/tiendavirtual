@@ -1,0 +1,41 @@
+name: Construir y Desplegar a AWS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      AWS_REGION: ${{ env.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }}
+
+    steps:
+      - name: Recuperar el código
+        uses: actions/checkout@v3
+
+      - name: Configurar las credenciales AWS
+        run: |
+          aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+          aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+          aws configure set aws_session_token "$AWS_SESSION_TOKEN"
+          aws configure set region "$AWS_REGION"
+
+      - name: Verificar las credenciales
+        run: aws sts get-caller-identity
+
+      - name: Construir la imagen docker
+        run: docker build -t tienda-virtual .
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password | docker login --username AWS --password-stdin ${{AWS_ACCOUNT_ID}}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+      - name: Push Docker image
+        run: |
+          docker tag tienda-virtual ${{AWS_ACCOUNT_ID}}.dkr.ecr.${AWS_REGION}.amazonaws.com/tienda-virtual
+          docker push ${{AWS_ACCOUNT_ID}}.dkr.ecr.${AWS_REGION}.amazonaws.com/my-image-name
