@@ -29,6 +29,9 @@ jobs:
       - name: Verificar las credenciales
         run: aws sts get-caller-identity
 
+      - name: Construir Spring Boot app
+        run: ./mvnw clean package -DskipTests
+
       - name: Construir la imagen docker
         run: docker build -t tienda-virtual .
 
