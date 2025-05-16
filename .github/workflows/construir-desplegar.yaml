@@ -35,9 +35,13 @@ jobs:
       - name: Construir la imagen docker
         run: docker build -t tienda-virtual .
 
-      - name: Login to ECR
+      - name: Iniciar Sesión en ECR
         run: |
           aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+      - name: Crear el reposiorio ECR si no existe
+        run: |
+          aws ecr describe-repositories --repository-names tienda-virtual || aws ecr create-repository --repository-name tienda-virtual
 
       - name: Push Docker image
         run: |
