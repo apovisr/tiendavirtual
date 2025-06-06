@@ -31,9 +31,11 @@ jobs:
 
       - name: Construir Spring Boot app
         run: ./mvnw clean package -DskipTests
+        working-directory: backend
 
       - name: Construir la imagen docker
         run: docker build -t tienda-virtual .
+        working-directory: backend
 
       - name: Iniciar Sesión en ECR
         run: |

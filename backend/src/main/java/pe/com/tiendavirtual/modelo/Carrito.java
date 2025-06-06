@@ -1,12 +1,13 @@
 package pe.com.tiendavirtual.modelo;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "CARRITO")
@@ -26,4 +27,8 @@ public class Carrito {
     @JoinColumn(name = "idCliente")
     @JsonBackReference
     private Cliente cliente;
+
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ItemCarrito> items = new ArrayList<>();
 }

@@ -31,6 +31,9 @@ public class CarritoController {
 
     @PostMapping
     public ResponseEntity<Carrito> crear(@RequestBody Carrito carrito) {
+        if (carrito.getItems() != null) {
+            carrito.getItems().forEach(item -> item.setCarrito(carrito));
+        }
         Carrito nuevoCarrito = carritoService.guardar(carrito);
         return ResponseEntity.ok(nuevoCarrito);
     }
@@ -40,6 +43,9 @@ public class CarritoController {
         Optional<Carrito> carritoExistente = carritoService.obtenerPorId(id);
         if (carritoExistente.isPresent()) {
             carritoActualizado.setId(id);
+            if (carritoActualizado.getItems() != null) {
+                carritoActualizado.getItems().forEach(item -> item.setCarrito(carritoActualizado));
+            }
             return ResponseEntity.ok(carritoService.guardar(carritoActualizado));
         } else {
             return ResponseEntity.notFound().build();
@@ -50,5 +56,10 @@ public class CarritoController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         carritoService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/cliente/{clienteId}")
+    public List<Carrito> listarPorCliente(@PathVariable Long clienteId) {
+        return carritoService.listarPorClienteId(clienteId);
     }
 }
