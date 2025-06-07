@@ -1,6 +1,7 @@
 package pe.com.tiendavirtual.modelo;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "CARRITO")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Carrito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
