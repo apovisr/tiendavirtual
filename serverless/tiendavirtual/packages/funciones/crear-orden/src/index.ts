@@ -3,7 +3,7 @@ import { EventBridgeEvent } from 'aws-lambda';
 export const handler = async (
   event: EventBridgeEvent<string, any>
 ): Promise<void> => {
-  const baseUrl = process.env.SERVICE_BASE_URL;
+  const baseUrl = process.env.URL_BASE_SERVICIO;
   
   if (!baseUrl) {
     console.error('SERVICE_BASE_URL no está definida en las variables de entorno.');
