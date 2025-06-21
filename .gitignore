@@ -5,3 +5,5 @@ target
 *.lock.hcl
 .terraform
 iac/data
+*/.next
+*/node_modules
