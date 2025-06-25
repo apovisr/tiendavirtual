@@ -126,37 +126,37 @@ resource "aws_appautoscaling_policy" "politica_de_autoescalamiento_ecs" {
 }
 
 resource "aws_lb" "tienda_virtual_load_balancer" {
-  name               = "tienda-virtual-alb"
-  internal           = false
-  load_balancer_type = "application"
-  subnets            = data.aws_subnets.sub_redes_por_defecto.ids
-  security_groups    = [data.aws_security_group.grupo_seguridad_por_defecto.id]
+    name               = "tienda-virtual-alb"
+    internal           = false
+    load_balancer_type = "application"
+    subnets            = data.aws_subnets.sub_redes_por_defecto.ids
+    security_groups    = [data.aws_security_group.grupo_seguridad_por_defecto.id]
 }
 
 resource "aws_lb_target_group" "tg_tienda_virtual" {
-  name     = "tg-tienda-virtual"
-  port     = 8080
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.vpc_por_defecto.id
-  target_type = "ip"
+    name     = "tg-tienda-virtual"
+    port     = 8080
+    protocol = "HTTP"
+    vpc_id   = data.aws_vpc.vpc_por_defecto.id
+    target_type = "ip"
 
-  health_check {
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    matcher             = "200"
-  }
+    health_check {
+        path                = "/"
+        interval            = 30
+        timeout             = 5
+        healthy_threshold   = 2
+        unhealthy_threshold = 2
+        matcher             = "200"
+    }
 }
 
 resource "aws_lb_listener" "http_listener" {
-  load_balancer_arn = aws_lb.tienda_virtual_load_balancer.arn
-  port              = 80
-  protocol          = "HTTP"
+    load_balancer_arn = aws_lb.tienda_virtual_load_balancer.arn
+    port              = 80
+    protocol          = "HTTP"
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tg_tienda_virtual.arn
-  }
+    default_action {
+        type             = "forward"
+        target_group_arn = aws_lb_target_group.tg_tienda_virtual.arn
+    }
 }

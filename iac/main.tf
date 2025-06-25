@@ -10,7 +10,7 @@ provider "aws" {
 module "serverless" {
     source = "./modules/serverless"
     rol_lambda_arn = var.rol_lab_arn
-    url_base_servicio = var.url_base_servicio
+    url_base_servicio = "http://${module.compute.load_balancer_url}/api"
 }
 
 module "compute" {

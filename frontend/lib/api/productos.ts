@@ -1,52 +1,71 @@
 import { Producto } from "@/modelo/producto";
 
-let productos: Producto[] = [
-  {
-    id: 1,
-    codigo: 'P001',
-    nombre: 'Laptop HP 14',
-    descripcion: 'Laptop ligera y potente con 16GB RAM y SSD de 512GB',
-    precio: 2500,
-    stock: 15,
-  },
-  {
-    id: 2,
-    codigo: 'P002',
-    nombre: 'Mouse Logitech',
-    descripcion: 'Mouse inalámbrico ergonómico',
-    precio: 80,
-    stock: 100,
-  },
-  {
-    id: 3,
-    codigo: 'P003',
-    nombre: 'Monitor LG 24"',
-    descripcion: 'Monitor IPS Full HD 24 pulgadas',
-    precio: 750,
-    stock: 20,
-  },
-];
-
 export async function getProductos(): Promise<Producto[]> {
-  return productos;
+  const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+  if (!baseUrl) {
+    throw new Error('La URL base de la API no está definida');
+  }
+
+  const response =  await fetch(`${baseUrl}/productos`);
+  return await response.json();
 }
 
 export async function agregarProducto(producto: Omit<Producto, 'id'>): Promise<Producto> {
-    const nuevoProducto: Producto = {
-        id: Date.now(),
-        ...producto,
-    };
-    productos.push(nuevoProducto);
-    return nuevoProducto;
+  const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+  if (!baseUrl) {
+    throw new Error('La URL base de la API no está definida');
+  }
+
+  const response = await fetch(`${baseUrl}/productos`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(producto)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error al agregar producto: ${response.status} ${response.statusText}`);
+  }
+
+  const nuevoProducto: Producto = await response.json();
+  return nuevoProducto;
 }
 
 export async function actualizarProducto(productoActualizado: Producto): Promise<Producto> {
-    productos = productos.map(p =>
-        p.id === productoActualizado.id ? productoActualizado : p
-    );
-    return productoActualizado;
+  const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+
+  if (!baseUrl) {
+    throw new Error('La URL base de la API no está definida');
+  }
+
+  const response = await fetch(`${baseUrl}/productos/${productoActualizado.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(productoActualizado)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error al actualizar producto: ${response.status} ${response.statusText}`);
+  }
+
+  return await response.json();
 }
 
 export async function eliminarProducto(id: number): Promise<void> {
-    productos = productos.filter(p => p.id !== id);
+  const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+
+  if (!baseUrl) {
+    throw new Error('La URL base de la API no está definida');
+  }
+
+  const response = await fetch(`${baseUrl}/productos/${id}`, {
+    method: 'DELETE'
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error al eliminar producto: ${response.status} ${response.statusText}`);
+  }
 }
