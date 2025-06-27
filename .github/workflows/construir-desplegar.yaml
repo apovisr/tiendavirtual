@@ -97,5 +97,5 @@ jobs:
         run: npm install -g vercel
 
       - name: Desplegar en Vercel
-        run: vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes --project ${{ vars.VERCEL_NOMBRE_PROYECTO }}
+        run: vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
         working-directory: frontend
