@@ -60,7 +60,19 @@ jobs:
         working-directory: iac
 
       - name: Aplicar Terraform
-        run: terraform apply -auto-approve
+        run: |
+          terraform apply \
+            -var="id_cuenta_aws=${{ vars.AWS_ACCOUNT_ID }}" \
+            -var="rol_lab_arn=${{ vars.ROL_LAB_ARN }}" \
+            -var="url_base_servicio=${{ vars.URL_BASE_SERVICIO }}" \
+            -var="nombre_cluster_ecs=${{ vars.NOMBRE_CLUSTER }}" \
+            -var="familia_tarea_ecs=${{ vars.FAMILIA_TAREA_ECS }}" \
+            -var="nombre_repo_ecr=${{ vars.NOMBRE_REPO_ECR }}" \
+            -var="servidor_base_datos=${{ vars.SERVIDOR_BASE_DATOS }}" \
+            -var="usuario_base_datos=${{ vars.USUARIO_BASE_DATOS }}" \
+            -var="contrasenha_base_datos=${{ secrets.CONTRASENHA_BASE_DATOS }}" \
+            -var="nombre_servicio_ecs=${{ vars.NOMBRE_SERVICIO }}" \
+            -auto-approve
         working-directory: iac
 
       - name: Forzar nuevo despliegue ECS
