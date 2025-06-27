@@ -50,6 +50,12 @@ jobs:
           docker tag tienda-virtual ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/tienda-virtual
           docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/tienda-virtual
       
+      - name: Build Lambda Functions
+        run: |
+          cd serverless/tiendavirtual/packages/funciones/crear-orden
+          npm ci
+          npm run build
+
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v3
         with:
