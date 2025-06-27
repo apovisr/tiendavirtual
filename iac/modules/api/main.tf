@@ -138,8 +138,8 @@ resource "aws_apigatewayv2_route" "clientes_get_proxy" {
 
 resource "aws_apigatewayv2_route" "clientes_post" {
   api_id    = aws_apigatewayv2_api.http_api.id
-  route_key = "POST /clientes/{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.clientes_integration.id}"
+  route_key = "POST /clientes"
+  target    = "integrations/${aws_apigatewayv2_integration.clientes_integration_get_all.id}"
 }
 
 resource "aws_apigatewayv2_route" "clientes_put_proxy" {
@@ -172,8 +172,8 @@ resource "aws_apigatewayv2_route" "producto_get_proxy" {
 
 resource "aws_apigatewayv2_route" "producto_post" {
   api_id    = aws_apigatewayv2_api.http_api.id
-  route_key = "POST /productos/{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.productos_integration.id}"
+  route_key = "POST /productos"
+  target    = "integrations/${aws_apigatewayv2_integration.productos_integration_get_all.id}"
 }
 
 resource "aws_apigatewayv2_route" "producto_put_proxy" {

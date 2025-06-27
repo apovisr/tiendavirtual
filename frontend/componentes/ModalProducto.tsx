@@ -10,14 +10,16 @@ interface ModalProductoProps {
 }
 
 const ModalProducto: React.FC<ModalProductoProps> = ({ producto, cerrar, grabar }) => {
+  const [codigo, setCodigo] = useState<string>(producto ? producto.codigo : '');
   const [nombre, setNombre] = useState<string>(producto ? producto.nombre : '');
+  const [descripcion, setDescripcion] = useState<string>(producto ? producto.descripcion : '');
   const [precio, setPrecio] = useState<number | string>(producto ? producto.precio : '');
   const [stock, setStock] = useState<number | string>(producto ? producto.stock : '');
 
   const enviarFormulario = (e: React.FormEvent) => {
     e.preventDefault();
     if (nombre && precio !== '' && stock !== '') {
-      grabar({ ...producto, nombre, precio: parseFloat(precio as string), stock: parseInt(stock as string) } as Producto);
+      grabar({ ...producto, codigo, nombre, descripcion, precio: parseFloat(precio as string), stock: parseInt(stock as string) } as Producto);
     }
   };
 
@@ -26,6 +28,17 @@ const ModalProducto: React.FC<ModalProductoProps> = ({ producto, cerrar, grabar 
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">{producto ? 'Editar Producto' : 'Agregar Nuevo Producto'}</h2>
         <form onSubmit={enviarFormulario} className="space-y-4">
+          <div>
+            <label htmlFor="codigoProducto" className="block text-sm font-medium text-gray-700">Código Producto</label>
+            <input
+              type="text"
+              id="codigoProducto"
+              value={codigo}
+              onChange={(e) => setCodigo(e.target.value)}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
           <div>
             <label htmlFor="nombreProducto" className="block text-sm font-medium text-gray-700">Nombre Producto</label>
             <input
@@ -38,6 +51,17 @@ const ModalProducto: React.FC<ModalProductoProps> = ({ producto, cerrar, grabar 
             />
           </div>
           <div>
+            <label htmlFor="descripcionProducto" className="block text-sm font-medium text-gray-700">Descripción Producto</label>
+            <input
+              type="text"
+              id="descripcionProducto"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div>
             <label htmlFor="precioProducto" className="block text-sm font-medium text-gray-700">Precio</label>
             <input
               type="number"
@@ -45,7 +69,7 @@ const ModalProducto: React.FC<ModalProductoProps> = ({ producto, cerrar, grabar 
               value={precio}
               onChange={(e) => setPrecio(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-              step="0.01"
+              step="1"
               required
             />
           </div>

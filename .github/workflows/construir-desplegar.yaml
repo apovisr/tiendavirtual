@@ -49,3 +49,35 @@ jobs:
         run: |
           docker tag tienda-virtual ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/tienda-virtual
           docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/tienda-virtual
+      
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+
+      - name: Inicializar Terraform
+        run: terraform init -backend-config "bucket=${{ vars.BUCKET }}" -backend-config "dynamodb_table=${{ vars.LOCKS }}"
+        working-directory: iac
+
+      - name: Aplicar Terraform
+        run: terraform apply -auto-approve
+        working-directory: iac
+
+      - name: Forzar nuevo despliegue ECS
+        run: |
+          aws ecs update-service --cluster ${{ vars.NOMBRE_CLUSTER }} --service ${{ vars.NOMBRE_SERVICIO }} --force-new-deployment
+
+      - name: Instalar dependencias Frontend
+        run: npm install
+        working-directory: frontend
+
+      - name: Compilar Frontend
+        run: npm run build
+        working-directory: frontend
+
+      - name: Instalar Vercel CLI
+        run: npm install -g vercel
+
+      - name: Desplegar en Vercel
+        run: vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes --project ${{ vars.VERCEL_NOMBRE_PROYECTO }}
+        working-directory: frontend

@@ -32,7 +32,9 @@ const PaginaProductos: React.FC<PaginaProductosProps> = ({
         <table className="min-w-full bg-white rounded-lg overflow-hidden">
           <thead className="bg-gray-100 border-b border-gray-200">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -41,7 +43,9 @@ const PaginaProductos: React.FC<PaginaProductosProps> = ({
           <tbody className="divide-y divide-gray-200">
             {productos.map((producto) => (
               <tr key={producto.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{producto.codigo}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{producto.nombre}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{producto.descripcion}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${producto.precio.toFixed(2)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{producto.stock}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
