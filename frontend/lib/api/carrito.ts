@@ -1,74 +1,151 @@
 import { Carrito } from "@/modelo/carrito";
 import { ItemCarrito } from "@/modelo/itemCarrito";
-import { clientes } from "./clientes";
 
-const carritos: Carrito[] = [];
-let itemsCarrito: ItemCarrito[] = [];
-let itemIdCounter = 1;
-let carritoIdCounter = 1;
 
-// Crear un carrito por cliente
-clientes.forEach(cliente => {
-  const carrito: Carrito = {
-    id: carritoIdCounter++,
-    nombre: `Carrito de ${cliente.nombre}`,
-    fecha: new Date(),
-    cliente: cliente,
-    items: []
-  };
+export async function getCarritos(): Promise<Carrito[]> {
+    const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+    if (!baseUrl) {
+        throw new Error('La URL base de la API no está definida');
+    }
 
-  carritos.push(carrito);
-  cliente.carritos.push(carrito); // Asocia el carrito al cliente
-});
+    const response = await fetch(`${baseUrl}/carritos`);
+    if (!response.ok) {
+        throw new Error("Error fetching carritos");
+    }
+
+    return response.json();
+}
+
+export async function getCarritoPorId(id: number): Promise<Carrito> {
+    const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+    if (!baseUrl) {
+        throw new Error('La URL base de la API no está definida');
+    }
+
+    const response = await fetch(`${baseUrl}/carritos/${id}`);
+    if (!response.ok) {
+        throw new Error(`Error al traer el carrito: ${response.status} ${response.statusText}`);
+    }
+  
+    return response.json();
+}
 
 export async function getCarritoPorCliente(clienteId: number): Promise<Carrito | undefined> {
-  return carritos.find(c => c.cliente.id === clienteId);
-}
+    const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+    if (!baseUrl) {
+        throw new Error('La URL base de la API no está definida');
+    }
+  
+    const response = await fetch(`${baseUrl}/carritos/cliente/${clienteId}`);
+    if (!response.ok) {
+        throw new Error(`Error al traer el carrito: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json();
 
-export async function agregarItemAlCarrito(nuevoItem: ItemCarrito) {
-    let carrito = carritos.find(c => c.id === nuevoItem.carrito.id);
-
-    if (!carrito) {
-        carrito = {
-            id: carritoIdCounter++,
-            nombre: `Carrito de ${nuevoItem.carrito.cliente.nombre}`,
-            fecha: new Date(),
-            cliente: nuevoItem.carrito.cliente,
-            items: []
-        };
-        carritos.push(carrito);
-        nuevoItem.carrito.cliente.carritos.push(carrito);
+    if (Array.isArray(data)) {
+        return data.length > 0 ? data[0] : undefined;
     }
 
-    const item: ItemCarrito = {
-        ...nuevoItem,
-        id: itemIdCounter++,
-        carrito
+    return data;
+}
+
+export async function crearCarrito(carrito: Carrito): Promise<Carrito> {
+    const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+    if (!baseUrl) {
+        throw new Error('La URL base de la API no está definida');
+    }
+
+    const response = await fetch(`${baseUrl}/carritos`, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(carrito)
+    });
+    
+    if (!response.ok) {
+        throw new Error(`Error al crear el carrito: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
+export async function agregarItemAlCarrito(nuevoItem: Omit<ItemCarrito, 'id'>): Promise<Carrito> {
+    const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+    if (!baseUrl) {
+        throw new Error('La URL base de la API no está definida');
+    }
+
+    const carrito = await getCarritoPorId(nuevoItem.carrito.id);
+    if (!carrito) {
+        throw new Error(`El carrito con ID ${nuevoItem.carrito.id} no existe`);
+    }
+
+    const updatedCarrito: Carrito = {
+        ...carrito,
+        items: [...(carrito.items || []), { ...nuevoItem, id: Date.now() }] // ID temporal, si es necesario, el backend ignora
     };
 
-    carrito.items = [...(carrito.items || []), item];
-    itemsCarrito.push(item);
-
-    return carrito;
+    return actualizarCarrito(updatedCarrito.id, updatedCarrito);
 }
 
-export async function actualizarItemCarrito(id: number, nuevaCantidad: number, subTotal: number): Promise<Carrito> {
-    const item = itemsCarrito.find(i => i.id === id);
-    if (item) {
-        item.cantidad = nuevaCantidad;
-        item.subTotal = subTotal;
+export async function actualizarItemCarrito(item: ItemCarrito): Promise<Carrito> {
+    const carrito = await getCarritoPorId(item.carrito.id);
+    if (!carrito) {
+        throw new Error(`El carrito con ID ${item.carrito.id} no existe`);
     }
 
-    const carrito = carritos.find(c => c.items?.some(i => i.id === id));
-    return carrito!;
+    const updatedItems = carrito.items?.map(i => i.id === item.id ? item : i) || [];
+    const updatedCarrito: Carrito = { ...carrito, items: updatedItems };
+
+    return actualizarCarrito(updatedCarrito.id, updatedCarrito);
 }
 
-export async function eliminarItemDelCarrito(id: number): Promise<void> {
-    itemsCarrito = itemsCarrito.filter(i => i.id !== id);
+export async function eliminarItemDelCarrito(itemId: number, carritoId: number): Promise<Carrito> {
+    const carrito = await getCarritoPorId(carritoId);
+    if (!carrito) {
+        throw new Error(`El carrito con ID ${carritoId} no existe`);
+    }
 
-    for (const carrito of carritos) {
-        if (carrito.items) {
-        carrito.items = carrito.items.filter(i => i.id !== id);
-        }
+    const updatedItems = carrito.items?.filter(i => i.id !== itemId) || [];
+    const updatedCarrito: Carrito = { ...carrito, items: updatedItems };
+
+    return actualizarCarrito(updatedCarrito.id, updatedCarrito);
+}
+
+export async function actualizarCarrito(id: number, carrito: Carrito): Promise<Carrito> {
+    const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+    if (!baseUrl) {
+        throw new Error('La URL base de la API no está definida');
+    }
+
+    const response = await fetch(`${baseUrl}/carritos/${id}`, {
+        method: 'PUT',
+        headers: { 
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(carrito)
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error al actualizar el carrito: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
+export async function eliminarCarrito(id: number): Promise<void> {
+    const baseUrl = process.env.NEXT_PUBLIC_URL_BASE_API;
+    if (!baseUrl) {
+        throw new Error('La URL base de la API no está definida');
+    }
+
+    const response = await fetch(`${baseUrl}/carritos/${id}`, { 
+        method: "DELETE" 
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error al eliminar el carrito: ${response.status} ${response.statusText}`);
     }
 }

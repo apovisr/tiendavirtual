@@ -1,6 +1,12 @@
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "tienda-virtual-api"
   protocol_type = "HTTP"
+
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers = ["*"]
+  }
 }
 
 resource "aws_apigatewayv2_integration" "productos_integration_get_all" {
@@ -132,8 +138,8 @@ resource "aws_apigatewayv2_route" "clientes_get_proxy" {
 
 resource "aws_apigatewayv2_route" "clientes_post" {
   api_id    = aws_apigatewayv2_api.http_api.id
-  route_key = "POST /clientes/{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.clientes_integration.id}"
+  route_key = "POST /clientes"
+  target    = "integrations/${aws_apigatewayv2_integration.clientes_integration_get_all.id}"
 }
 
 resource "aws_apigatewayv2_route" "clientes_put_proxy" {

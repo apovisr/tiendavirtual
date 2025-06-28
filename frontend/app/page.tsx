@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PaginaProductos from '@/componentes/PaginaProductos';
 import PaginaClientes from '@/componentes/PaginaClientes';
 import PaginaCarrito from '@/componentes/PaginaCarrito';
@@ -14,6 +14,7 @@ import { useProductos } from '@/hooks/useProductos';
 import { useMensaje } from '@/hooks/useMensaje';
 import { Producto } from '@/modelo/producto';
 import { Cliente } from '@/modelo/cliente';
+import { Carrito } from '@/modelo/carrito';
 
 
 export default function Home() {
@@ -27,6 +28,18 @@ export default function Home() {
 
   const cargando = productosHook.cargando || clientesHook.cargando || ordenesHook.cargando;
   const carrito = carritoHook.carrito;
+
+  useEffect(() => {
+    const manejarActualizacionCarrito = (event: CustomEvent) => {
+        carritoHook.setCarrito(event.detail);
+    };
+
+    window.addEventListener("actualizar-carrito", manejarActualizacionCarrito as EventListener);
+
+    return () => {
+        window.removeEventListener("actualizar-carrito", manejarActualizacionCarrito as EventListener);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans text-gray-900">      
@@ -109,9 +122,10 @@ export default function Home() {
         {paginaActual === 'carrito' && (
           <PaginaCarrito
             carrito={carritoHook.carrito}
+            setCarrito={carritoHook.setCarrito}
             actualizarCantidadProducto={carritoHook.actualizarCantidadEnCarrito}
             quitarProducto={carritoHook.eliminarDelCarrito}
-            crearOrden={ordenesHook.realizarPedido}
+            crearOrden={() => ordenesHook.realizarPedido(carritoHook.carrito, () => carritoHook.setCarrito({} as Carrito))}
           />
         )}
 
@@ -119,6 +133,7 @@ export default function Home() {
           <PaginaOrdenes
             ordenes={ordenesHook.ordenes}
             clientes={clientesHook.clientes}
+            obtenerPedidos={ordenesHook.obtenerPedidos}
           />
         )}
       </main>

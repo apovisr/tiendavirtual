@@ -45,7 +45,7 @@ ALTER TABLE ITEMCARRITO
         
 CREATE TABLE ORDEN (
 	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
-    numero CHAR(10) NOT NULL, 
+    numero CHAR(10) NULL, 
     idCarrito INT NOT NULL, 
     fecha DATE NOT NULL, 
     subTotal DECIMAL(10, 2) NOT NULL, 

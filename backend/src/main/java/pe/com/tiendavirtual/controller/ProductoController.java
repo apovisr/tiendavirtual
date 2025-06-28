@@ -38,7 +38,12 @@ public class ProductoController {
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizar(@PathVariable Long id, @RequestBody Producto updated) {
         return service.obtenerPorId(id).map(producto -> {
-            producto.setId(id);
+            producto.setCodigo(updated.getCodigo());
+            producto.setNombre(updated.getNombre());
+            producto.setDescripcion(updated.getDescripcion());
+            producto.setPrecio(updated.getPrecio());
+            producto.setStock(updated.getStock());
+
             return ResponseEntity.ok(service.guardar(producto));
         }).orElse(ResponseEntity.notFound().build());
     }

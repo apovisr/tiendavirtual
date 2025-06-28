@@ -9,11 +9,10 @@ import { ItemOrden } from '@/modelo/itemOrden';
 
 export function useOrdenes() {
     const [ordenes, setOrdenes] = useState<Orden[]>([]);
-    const [carrito, setCarrito] = useState<Carrito>({} as Carrito);
     const [cargando, setCargando] = useState(false);
     const { mostrarMensaje } = useMensaje();
 
-    const realizarPedido = async () => {
+    const realizarPedido = async (carrito: Carrito, limpiarCarrito: () => void) => {
         if (!carrito.items || carrito.items.length === 0) {
             mostrarMensaje('El carrito está vacío. Agrega productos antes de realizar el pedido.', 'error');
             return;
@@ -43,9 +42,8 @@ export function useOrdenes() {
             const nuevaOrden = await ordenessApi.realizarPedido(nuevaOrdenPayload);
 
             setOrdenes(prev => [...prev, nuevaOrden]);
-            setCarrito(prev => ({ ...prev, items: [] }));
+            limpiarCarrito();
             mostrarMensaje('¡Pedido realizado con éxito!', 'success');
-            // setPaginaActual('pedidos');
         } catch (error) {
             mostrarMensaje('No se pudo realizar el pedido.', 'error');
             console.error("Error al realizar el pedido:", error);
@@ -54,9 +52,23 @@ export function useOrdenes() {
         }
     };
 
+    const obtenerPedidos = async () => {
+        setCargando(true);
+        try {
+            const lista = await ordenessApi.listarPedidos();
+            setOrdenes(lista);
+        } catch (error) {
+            mostrarMensaje('No se pudieron cargar los pedidos.', 'error');
+            console.error("Error al cargar los pedidos:", error);
+        } finally {
+            setCargando(false);
+        }
+    };
+
     return {
         ordenes, 
         realizarPedido, 
+        obtenerPedidos,
         cargando
     }
 }
